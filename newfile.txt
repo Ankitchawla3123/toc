@@ -1,0 +1,400 @@
+//concatenation 
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Prototypes for L1 states (for "aa")
+void stateL1_0(const string &w, int i); // Initial state of L1
+void stateL1_1(const string &w, int i); // Found first 'a'
+void stateL1_2(const string &w, int i); // Found "aa"
+
+// Prototypes for L2 states (for "bb")
+void stateL2_0(const string &w, int i); // Initial state of L2
+void stateL2_1(const string &w, int i); // Found first 'b'
+void stateL2_2(const string &w, int i); // Found "bb"
+
+// Function to simulate the concatenated FA
+void simulateFA(const string &w) {
+    if (w.length() < 4) {
+        cout << "String is rejected (Length is less than 4)" << endl;
+        return;
+    }
+    stateL1_0(w, 0); // Start with L1
+}
+
+// L1 simulation: Check for "aa"
+void stateL1_0(const string &w, int i) {
+    if (i >= w.length()) {
+        cout << "String is rejected by L1 (Did not find 'aa')" << endl;
+        return;
+    }
+    cout << "L1 State 0: Reading '" << w[i] << "'" << endl;
+    if (w[i] == 'a') {
+        stateL1_1(w, i + 1); // Move to state L1_1 if 'a' is found
+    } else {
+        stateL1_0(w, i + 1); // Stay in L1_0 if not 'a'
+    }
+}
+
+void stateL1_1(const string &w, int i) {
+    if (i >= w.length()) {
+        cout << "String is rejected by L1 (Did not find 'aa')" << endl;
+        return;
+    }
+    cout << "L1 State 1: Reading '" << w[i] << "'" << endl;
+    if (w[i] == 'a') {
+        stateL1_2(w, i + 1); // Move to state L1_2 if second 'a' is found
+    } else {
+        stateL1_0(w, i); // Go back to L1_0 to look for "aa" again
+    }
+}
+
+void stateL1_2(const string &w, int i) {
+    cout << "L1 State 2: Found 'aa'. Transitioning to L2..." << endl;
+    stateL2_0(w, i); // Transition to L2 to check for "bb"
+}
+
+// L2 simulation: Check for "bb"
+void stateL2_0(const string &w, int i) {
+    if (i >= w.length()) {
+        cout << "String is rejected by L2 (Did not find 'bb')" << endl;
+        return;
+    }
+    cout << "L2 State 0: Reading '" << w[i] << "'" << endl;
+    if (w[i] == 'b') {
+        stateL2_1(w, i + 1); // Move to state L2_1 if 'b' is found
+    } else {
+        stateL2_0(w, i + 1); // Stay in L2_0 if not 'b'
+    }
+}
+
+void stateL2_1(const string &w, int i) {
+    if (i >= w.length()) {
+        cout << "String is rejected by L2 (Did not find 'bb')" << endl;
+        return;
+    }
+    cout << "L2 State 1: Reading '" << w[i] << "'" << endl;
+    if (w[i] == 'b') {
+        stateL2_2(w, i + 1); // Move to state L2_2 if second 'b' is found
+    } else {
+        stateL2_0(w, i); // Go back to L2_0 to look for "bb" again
+    }
+}
+
+void stateL2_2(const string &w, int i) {
+    cout << "L2 State 2: Found 'bb'. String is accepted!" << endl;
+}
+
+// Main function
+int main() {
+    string input;
+    cout << endl << "Enter a string over {a, b}: ";
+    cin >> input;
+    simulateFA(input);
+    return 0;
+}
+
+
+// union
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Prototypes for state functions
+void stateL1_0(const string &w, int i); // First FA: Check for "aa"
+void stateL2_0(const string &w, int i); // Second FA: Check for "bb"
+
+// Function to simulate the union FA (Two separate FAs)
+void simulateFA(const string &w) {
+    if (w.length() < 4) {
+        cout << "String is rejected (Length is less than 4)" << endl;
+        return;
+    }
+
+    // First FA: Check for "ends with aa"
+    cout << "Checking for 'aa' at the end..." << endl;
+    bool acceptedByL1 = false;
+    stateL1_0(w, 0, acceptedByL1); // Check with the first FA
+
+    if (!acceptedByL1) {
+        // Second FA: Check for "ends with bb"
+        cout << "Checking for 'bb' at the end..." << endl;
+        bool acceptedByL2 = false;
+        stateL2_0(w, 0, acceptedByL2); // Check with the second FA
+
+        if (acceptedByL2) {
+            cout << "String is accepted by FA2 (ends with 'bb')" << endl;
+        } else {
+            cout << "String is rejected (does not end with 'aa' or 'bb')" << endl;
+        }
+    } else {
+        cout << "String is accepted by FA1 (ends with 'aa')" << endl;
+    }
+}
+
+// FA1: Check for "ends with 'aa'"
+void stateL1_0(const string &w, int i, bool &accepted) {
+    if (i == w.length() - 2 && w[i] == 'a' && w[i + 1] == 'a') {
+        accepted = true;
+        return;
+    }
+    // If not 'aa' at the end, return false
+    accepted = false;
+}
+
+// FA2: Check for "ends with 'bb'"
+void stateL2_0(const string &w, int i, bool &accepted) {
+    if (i == w.length() - 2 && w[i] == 'b' && w[i + 1] == 'b') {
+        accepted = true;
+        return;
+    }
+    // If not 'bb' at the end, return false
+    accepted = false;
+}
+
+// Main function
+int main() {
+    string input;
+    cout << endl << "Enter a string over {a, b}: ";
+    cin >> input;
+    simulateFA(input);
+    return 0;
+}
+
+
+// intersection
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Prototypes for state functions (for each FA)
+void state1_0(const string &w, int &i, bool &accepted); // FA1: Initial state, before finding 'a'
+void state1_1(const string &w, int &i, bool &accepted); // FA1: After finding 'a'
+
+void state2_0(const string &w, int &i, bool &accepted); // FA2: Initial state, before finding 'b'
+void state2_1(const string &w, int &i, bool &accepted); // FA2: After finding 1st 'b'
+void state2_2(const string &w, int &i, bool &accepted); // FA2: After finding 2nd 'b' at the end
+
+// Function to simulate the intersection FA (Both FAs must accept)
+void simulateFA(const string &w) {
+    if (w.length() < 2) {
+        cout << "String is rejected (Length is less than 2)" << endl;
+        return;
+    }
+
+    // First FA: Check for 'a' at any position
+    cout << "Checking for 'a' at any position..." << endl;
+    bool acceptedByL1 = false;
+    int i = 0;
+    state1_0(w, i, acceptedByL1); // Start with FA1 (checking for 'a')
+
+    // Second FA: Check for 'bb' at the end
+    cout << "Checking for 'bb' at the end..." << endl;
+    bool acceptedByL2 = false;
+    i = 0;
+    state2_0(w, i, acceptedByL2); // Start with FA2 (checking for 'bb' at the end)
+
+    // Intersection check: Both must accept
+    if (acceptedByL1 && acceptedByL2) {
+        cout << "String is accepted by both FAs (contains 'a' and ends with 'bb')" << endl;
+    } else {
+        cout << "String is rejected (does not meet intersection criteria)" << endl;
+    }
+}
+
+// FA1: State 0 - Initial state, before finding 'a'
+void state1_0(const string &w, int &i, bool &accepted) {
+    if (i < w.length()) {
+        if (w[i] == 'a') {
+            accepted = false; // Transition to State 1 when 'a' is found
+            state1_1(w, i, accepted);
+        } else {
+            i++;
+            state1_0(w, i, accepted); // Move to the next character
+        }
+    } else {
+        accepted = false; // If 'a' is not found, reject
+    }
+}
+
+// FA1: State 1 - After finding 'a', accept the string
+void state1_1(const string &w, int &i, bool &accepted) {
+    accepted = true; // Once 'a' is found, accept the string
+}
+
+// FA2: State 0 - Initial state, before finding 'b'
+void state2_0(const string &w, int &i, bool &accepted) {
+    if (i < w.length()) {
+        if (w[i] == 'b') {
+            i++;
+            state2_1(w, i, accepted); // Move to next state if 'b' is found
+        } else {
+            i++;
+            state2_0(w, i, accepted); // Move to next character
+        }
+    } else {
+        accepted = false; // Reject if 'b' is not found in the expected positions
+    }
+}
+
+// FA2: State 1 - After finding the first 'b', check for second 'b'
+void state2_1(const string &w, int &i, bool &accepted) {
+    if (i < w.length()) {
+        if (w[i] == 'b') {
+            i++;
+            state2_2(w, i, accepted); // Move to next state if second 'b' is found
+        } else {
+            accepted = false; // Reject if 'b' is not found in expected position
+        }
+    } else {
+        accepted = false; // Reject if end of string is reached without finding the second 'b'
+    }
+}
+
+// FA2: State 2 - After finding 'bb' at the end
+void state2_2(const string &w, int &i, bool &accepted) {
+    if (i == w.length()) {
+        accepted = true; // Accept if the second 'b' is found at the end
+    } else {
+        accepted = false; // Reject if there are characters after 'bb'
+    }
+}
+
+// Main function
+int main() {
+    string input;
+    cout << endl << "Enter a string over {a, b}: ";
+    cin >> input;
+    simulateFA(input);
+    return 0;
+}
+
+//
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class TuringMachine {
+public:
+    TuringMachine() {
+        // Initialize the tape and head
+        tape = vector<char>(1000, ' '); // 1000 cells on the tape
+        head = 500; // Start at the middle of the tape
+        currentState = "q0";
+    }
+
+    void run(const string& input) {
+        // Load the input onto the tape
+        for (int i = 0; i < input.length(); i++) {
+            tape[head + i] = input[i];
+        }
+
+        // Run the Turing machine
+        while (true) {
+            // Display the current state and tape
+            cout << "Current state: " << currentState << " Head at position: " << head << " Tape: ";
+            // cout<<tape[head];
+            for (int i = head - 6; i <= head + 6; i++) {
+                cout << tape[i];
+            }
+            cout << endl;
+
+            // Process based on the current state and tape symbol
+            if (currentState == "q0") {
+                if (tape[head] == 'a') {
+                    tape[head] = 'X'; // Mark 'a' as 'X'
+                    head++; // Move right
+                    currentState = "q1";
+                } else if (tape[head] == 'X') {
+                    currentState = "q0"; // If no more 'a's, check for empty input
+                    head++;
+                } 
+                else if (tape[head] == 'Y') {
+                    currentState = "q1"; // If no more 'a's, check for empty input
+                    head++;
+                } 
+                else {
+                    break; // Halt if neither 'a' nor blank space
+                }
+            } else if (currentState == "q1") {
+                if (tape[head] == 'a' || tape[head] == 'Y'  ) {
+                    head++; // Move right to continue looking for the first 'b'
+                } else if (tape[head] == 'b') {
+                    tape[head] = 'Y'; // Mark 'b' as 'Y'
+                    head++; // Move right
+                    currentState = "q2";
+                } else {
+                    break; // Halt if no 'b' found
+                }
+            } else if (currentState == "q2") {
+                if (tape[head] == 'b' || tape[head]=='Z') {
+                    head++; // Move right
+                } else if (tape[head] == 'c') {
+                    tape[head] = 'Z'; // Mark 'c' as 'Z'
+                    head--; // Move left
+                    currentState = "q3";
+                } else {
+                    break; // Halt if no 'c' found
+                }
+            } else if (currentState == "q3") {
+                if (tape[head] == 'X') {
+                 // Move left to find the next unmarked 'a'
+                    currentState = "q0"; // Go back to q0 to mark the next 'a'
+                } else if (tape[head] == 'Y' || tape[head] == 'Z') {
+                    head--; // Move left
+                    currentState = "q3"; // If no unmarked 'a' left, check for all 'Y'
+
+                } 
+                else if (tape[head] == 'b')
+                {
+                    head--;
+                    currentState = "q3";
+                }
+                else if (tape[head] == 'a')
+                {
+                    head--;
+                    currentState = "q3";
+                }
+        
+                
+                else {
+                    break; // Halt if neither 'X' nor 'Y' found
+                }
+            } else if (currentState == "q4") {
+                if (tape[head] == 'Y') {
+                    head--; // Move left to continue checking 'Y'
+                    currentState = "q4"; // Continue until no more 'Y'
+                } else if (tape[head] == 'Z') {
+                    head--; // Move left to continue checking 'Z'
+                    currentState = "qf"; // Final state
+                } else {
+                    break; // Halt if no 'Y' or 'Z' found
+                }
+            } else if (currentState == "qf") {
+                // Final state, halt the machine
+                cout << "Machine halts at final state." << endl;
+                break;
+            } else {
+                break; // Halt if an unknown state is encountered
+            }
+        }
+    }
+
+private:
+    vector<char> tape;  // The tape
+    int head;           // The head position
+    string currentState; // The current state
+};
+
+int main() {
+    string input;
+    cout << "Enter the input string: ";
+    cin >> input;
+
+    TuringMachine tm;
+    tm.run(input); // Run the Turing machine
+
+    return 0;
+}
